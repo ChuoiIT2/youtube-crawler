@@ -1,5 +1,6 @@
 const { Browser } = require('puppeteer');
 const infiniteScrollPage = require('../utils/infinite-scroll-page.util');
+const fs = require('fs/promises');
 
 /**
  * Asynchronously crawls IDs from a given page.
@@ -21,7 +22,7 @@ async function crawlIds(browser, query = '') {
   )}`;
   await page.goto(url, { waitUntil: 'networkidle2' });
 
-  const result = [];
+  let result = [];
 
   const scrollContainerIndex =
     'ytd-two-column-search-results-renderer.ytd-search';
@@ -34,14 +35,22 @@ async function crawlIds(browser, query = '') {
   const dataFromPage = await page.evaluate(async () => {
     const newIds = Array.from(
       document.querySelectorAll('#video-title.ytd-video-renderer')
-    ).map((item) => item.getAttribute('href')?.split('watch?v=')[1]?.split('&')[0]);
+    ).map(
+      (item) => item.getAttribute('href')?.split('watch?v=')[1]?.split('&')[0]
+    );
 
     return newIds;
   });
-
   result.push(...dataFromPage);
 
-  console.log(result, result.length);
+  const crawledIds = JSON.parse(await fs.readFile(`./data/ids-result.json`));
+  result.push(...crawledIds);
+  result = [...new Set(result)];
+
+  await fs.writeFile(`./data/ids-result.json`, JSON.stringify(result, null));
+  await page.close();
+
+  return;
 }
 
 module.exports = crawlIds;
