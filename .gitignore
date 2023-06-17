@@ -1,3 +1,4 @@
-/data
+/data/ids-result.json
+/data/details-result.json
 /node_modules
 .env
