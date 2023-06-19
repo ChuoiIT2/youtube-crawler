@@ -13,17 +13,17 @@ async function crawlDetails() {
   const result = [];
   for (let i = 0; i < listIds.length; i += 10) {
     const response = await youtube.videos.list({
-      part: 'snippet,statistics,contentDetails,status,topicDetails',
+      part: 'id,snippet,statistics,contentDetails,status,topicDetails',
       id: listIds.slice(i, i + 10).join(','),
       regionCode: 'VN',
     });
     const data = response.data.items.map((item) => {
       return {
-        id: item.id.videoId,
+        id: item.id,
         title: item.snippet.title,
         description: item.snippet.description,
         channelTitle: item.snippet.channelTitle,
-        categoryId: item.snippet.category,
+        categoryId: item.snippet.categoryId,
         tags: item.snippet.tags,
         defaultLanguage: item.snippet.defaultLanguage,
         defaultAudioLanguage: item.snippet.defaultAudioLanguage,
